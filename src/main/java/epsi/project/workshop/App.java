@@ -17,12 +17,13 @@ import org.openimaj.video.VideoDisplay;
 import org.openimaj.video.VideoDisplayListener;
 import org.openimaj.video.capture.VideoCapture;
  
+
 public class App implements VideoDisplayListener<MBFImage> {
  
-    /** Le détecteur de visages. */
+    /** Le dï¿½tecteur de visages. */
     private FaceDetector<DetectedFace,FImage> detecteurVisages;
  
-    /** Constantes et propriétés nécessaires à l'affichage de la zone de tracking. */
+    /** Constantes et propriï¿½tï¿½s nï¿½cessaires ï¿½ l'affichage de la zone de tracking. */
     private static int LARGEUR_WEBCAM = 640;
     private static int HAUTEUR_WEBCAM = 480;
  
@@ -44,7 +45,7 @@ public class App implements VideoDisplayListener<MBFImage> {
     /** Contructeur. */
     public App() throws Exception {
  
-        // Initialisation de la zone de tracking et des différents éléments à afficher
+        // Initialisation de la zone de tracking et des diffï¿½rents ï¿½lï¿½ments ï¿½ afficher
         zoneTracking = new Rectangle(X1, Y1, LARGEUR_ZONE_TRACKING, HAUTEUR_ZONE_TRACKING);
         flecheBas = new Polygon(new Point2dImpl(0, 30), new Point2dImpl(-10, 10), new Point2dImpl(-5, 10), new Point2dImpl(-5, -30), new Point2dImpl(5, -30), new Point2dImpl(5, 10), new Point2dImpl(10, 10));
         flecheHaut = flecheBas.clone();
@@ -62,24 +63,24 @@ public class App implements VideoDisplayListener<MBFImage> {
         // Initialisation du flux de capture sur la webcam
         final VideoCapture capture = new VideoCapture(LARGEUR_WEBCAM, HAUTEUR_WEBCAM);
  
-        // Création d'un affichage du flux vidéo
+        // Crï¿½ation d'un affichage du flux vidï¿½o
         final VideoDisplay<MBFImage> videoFrame = VideoDisplay.createVideoDisplay(capture);
  
-        // Ajout de l'écouteur sur le flux vidéo
+        // Ajout de l'ï¿½couteur sur le flux vidï¿½o
         videoFrame.addVideoListener(this);
  
-        // Création du détecteur de visages (détecteur de Haar avec une taille minimum des visages de 80 px, bonne valeur pour la résolution de webcam utilisée et pour des calculs rapides)
+        // Crï¿½ation du dï¿½tecteur de visages (dï¿½tecteur de Haar avec une taille minimum des visages de 80 px, bonne valeur pour la rï¿½solution de webcam utilisï¿½e et pour des calculs rapides)
         detecteurVisages = new HaarCascadeDetector(80);
  
     }
  
     
-    /** Implémentation du listener (après affichage de l'image dans le flux vidéo) ==> rien à faire. */
+    /** Implï¿½mentation du listener (aprï¿½s affichage de l'image dans le flux vidï¿½o) ==> rien ï¿½ faire. */
     public void afterUpdate(VideoDisplay<MBFImage> display) {
     }
      
     
-    /** Implémentation du listener (avant affichage de l'image dans le flux vidéo) ==> détection des visages et affichage des zones détectées. */
+    /** Implï¿½mentation du listener (avant affichage de l'image dans le flux vidï¿½o) ==> dï¿½tection des visages et affichage des zones dï¿½tectï¿½es. */
     public synchronized void beforeUpdate(MBFImage frame) {
  
         // Recherche du visage le plus grand (celui dont le cadre a l'aire la plus grande)
@@ -87,7 +88,7 @@ public class App implements VideoDisplayListener<MBFImage> {
         DetectedFace visagePlusGrand = null;
         final List<DetectedFace> listeVisagesDetectes = detecteurVisages.detectFaces(Transforms.calculateIntensity(frame));
         for (final DetectedFace visageDetecte : listeVisagesDetectes) {
-            // Cadre autour des visages détectés
+            // Cadre autour des visages dï¿½tectï¿½s
             frame.drawShape(visageDetecte.getShape(), 3, RGBColour.ORANGE);
             final double aireVisage = visageDetecte.getBounds().calculateArea();
             if (aireVisage > aireVisagePlusGrand) {
@@ -97,13 +98,12 @@ public class App implements VideoDisplayListener<MBFImage> {
         }
  
         if (visagePlusGrand != null) {
-            // Récupération du centre de gravité du visage
-            final Point2d centreVisage = visagePlusGrand.getBounds().getCOG();
- 
-            // Affichage du centre de gravité du visage
+            // Rï¿½cupï¿½ration du centre de gravitï¿½ du visage
+            final Point2d centreVisage = visagePlusGrand.getBounds().calculateRegularBoundingBox().getTopLeft();
+            // Affichage du centre de gravitï¿½ du visage
             frame.drawPoint(centreVisage, RGBColour.BLUE, 15);
  
-            // Couleur différente de la zone de tracking selon si le centre de gravité est à l'intérieur de la zone ou pas
+            // Couleur diffï¿½rente de la zone de tracking selon si le centre de gravitï¿½ est ï¿½ l'intï¿½rieur de la zone ou pas
             if (zoneTracking.isInside(centreVisage)) {
                 frame.drawShape(zoneTracking, 5, RGBColour.GREEN);
             } else {
@@ -113,10 +113,10 @@ public class App implements VideoDisplayListener<MBFImage> {
             // S'il faut tourner horizontalement
             if (centreVisage.getX() < X1 || centreVisage.getX() > X2) {
                 if (centreVisage.getX() < X1) {
-                    // Si le centre du visage est à gauche de la zone de tracking : tourner à gauche
+                    // Si le centre du visage est ï¿½ gauche de la zone de tracking : tourner ï¿½ gauche
                     frame.drawShape(flecheGauche, 3, RGBColour.YELLOW);
                 } else {
-                    // Si le centre du visage est à droite de la zone de tracking : tourner à droite
+                    // Si le centre du visage est ï¿½ droite de la zone de tracking : tourner ï¿½ droite
                     frame.drawShape(flecheDroite, 3, RGBColour.YELLOW);
                 }
             } else {
